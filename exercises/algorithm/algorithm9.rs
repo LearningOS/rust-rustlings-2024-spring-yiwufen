@@ -2,10 +2,10 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
+use std::process::id;
 
 pub struct Heap<T>
 where
@@ -37,9 +37,11 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
-    }
+        self.items.push(value);
+        self.count += 1;
+        self.sift_up(self.len());
 
+    }
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
     }
@@ -59,6 +61,46 @@ where
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
 		0
+    }
+    fn sift_up(&mut self, mut idx: usize) {
+        while idx > 1 {
+            let par_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[par_idx]) {
+                self.items.swap(idx, par_idx);
+                idx = par_idx;
+            } else {
+                break;
+            }
+        }
+    }
+    fn sift_down(&mut self, mut idx: usize) {
+        while self.left_child_idx(idx) <= self.len() {
+            let mut smallest = self.left_child_idx(idx);
+            if self.right_child_idx(idx) <= self.len() &&
+                (self.comparator)(&self.items[self.right_child_idx(idx)],&self.items[smallest]) {
+                smallest = self.right_child_idx(idx);
+            }
+            if (self.comparator)(&self.items[smallest], &self.items[idx]) {
+                self.items.swap(idx, smallest);
+                idx = smallest;
+            } else {
+                break;
+            }
+        }
+    }
+    fn pop(&mut self) -> Option<T> {
+        if self.is_empty() {
+            None
+        } else {
+            let last_idx = self.len();
+            self.items.swap(1, last_idx);
+            let res = self.items.pop();
+            self.count -= 1;
+            if !self.is_empty() {
+                self.sift_down(1);
+            }
+            res
+        }
     }
 }
 
@@ -84,8 +126,8 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        self.pop()
+		// None
     }
 }
 
@@ -141,9 +183,13 @@ mod tests {
     fn test_max_heap() {
         let mut heap = MaxHeap::new();
         heap.add(4);
+        println!("insert {}: {:?}",4, heap.items);
         heap.add(2);
+        println!("insert {}: {:?}",4, heap.items);
         heap.add(9);
+        println!("insert {}: {:?}",4, heap.items);
         heap.add(11);
+        println!("insert {}: {:?}",4, heap.items);
         assert_eq!(heap.len(), 4);
         assert_eq!(heap.next(), Some(11));
         assert_eq!(heap.next(), Some(9));

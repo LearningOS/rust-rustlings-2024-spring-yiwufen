@@ -3,10 +3,34 @@
 	This problem requires you to implement a sorting algorithm
 	you can use bubble sorting, insertion sorting, heap sorting, etc.
 */
-// I AM NOT DONE
 
-fn sort<T>(array: &mut [T]){
-	//TODO
+use std::mem::swap;
+
+fn sort<T: PartialOrd>(array: &mut [T]){
+	if array.len() <=1 {
+        return;
+    }
+
+    let mid = partition(array);
+
+    sort(&mut array[0..mid]);
+
+    if mid < array.len() -1 {
+        sort(&mut array[mid + 1..]);
+    }
+
+}
+fn partition<T: PartialOrd>(array: &mut [T]) -> usize {
+    let index = array.len() -1;
+    let mut i=0;
+    for j in 0..index {
+        if array[j] <= array[index] {
+            array.swap(i,j);
+            i+=1;
+        }
+    }
+    array.swap(i, index);
+    i
 }
 #[cfg(test)]
 mod tests {
